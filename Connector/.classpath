@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="C:/privateProject/Connector/lib/javax.websocket-api-1.0-rc5.jar"/>
+	<classpathentry kind="lib" path="C:/privateproject/chatRepos/Connector/lib/javax.websocket-api-1.0-rc5.jar"/>
+	<classpathentry kind="lib" path="C:/privateproject/chatRepos/Connector/lib/tyrus-standalone-client-1.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

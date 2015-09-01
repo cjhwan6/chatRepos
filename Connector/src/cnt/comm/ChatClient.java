@@ -1,13 +1,18 @@
 package cnt.comm;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.websocket.ClientEndpoint;
+import javax.websocket.ContainerProvider;
+import javax.websocket.DeploymentException;
+import javax.websocket.Endpoint;
+import javax.websocket.EndpointConfig;
 import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.WebSocketContainer;
 
 import ui.component.IFrame;
 import ui.component.IMetaFrame;
@@ -18,41 +23,66 @@ import ui.component.IMetaFrame;
  *
  */
 @ClientEndpoint
-public class ChatClient {
-	private Map<String, Session> sessionMap = new HashMap<String, Session>() ;
-	private String clientKey;
+public class ChatClient extends Endpoint {
+	private Session session = null;
+	private String clientKey = "";
 	private IFrame frmDiag = null;
 	private IMetaFrame frmMeta = null;
 	
-	ChatClient(IFrame frm){
-		frmDiag = frm;
-	}
-	
-	ChatClient(IMetaFrame frm){
-		frmMeta = frm;
-	}
-	@OnOpen
-	public void onOpen(Session session) {
-		
-    }
-	
-	@OnMessage
-	public void onMessage(Object Message){
-		if(frmMeta == null){
-			return;
+	public ChatClient(IFrame frm, String connUri){
+		frmDiag = frm;		
+		try {
+			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+			container.connectToServer(this, new URI(connUri));
+		} catch (DeploymentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		// 클라이언트 리스트들을 객체에서 받아 메인화면으로 전달.
-		ArrayList<String> strAlive = new ArrayList<String>(); 
-		frmMeta.listAliveClient(strAlive);
+	}
+	
+	public ChatClient(IMetaFrame frm, String connUri){
+		frmMeta = frm;		
+		try {
+			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+			container.connectToServer(this, new URI(connUri));
+		} catch (DeploymentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+
+	@Override
+	public void onOpen(Session sess, EndpointConfig ec) {
+		// TODO Auto-generated method stub
+		this.session = sess;
 	}
 
 	@OnMessage
-	public void onMessage(String message){
-		if(frmDiag == null){
-			return;
+	public void onMessage(Object message){
+		if(frmMeta == null){
+			// 이 EndPoint가 대화창과 연결된 경우
+			// 텍스트를 대화창 화면으로 전달.
+			frmDiag.setText(String.valueOf(message));
 		}
-		// 텍스트를 대화창 화면으로 전달.
-		frmDiag.setText(message);
+		else if(frmDiag == null){
+			// 이 EndPoint가 메인창 연결된 경우
+			// 연결 리스트들을 뿌려줌
+			frmMeta.listAliveClient((ArrayList<String>)message);;
+		}
+
 	}
 	
 }

@@ -1,92 +1,127 @@
 package com.core;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
-import javax.websocket.EncodeException;
+import javax.websocket.ClientEndpointConfig;
+import javax.websocket.DeploymentException;
 import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.OnClose;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
+import javax.websocket.Extension;
 import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import javax.websocket.WebSocketContainer;
+import javax.websocket.server.ServerEndpointConfig;
+
+public class ChatServer implements WebSocketContainer, Runnable {
+	
+	private Map<String,ArrayList<Session>> sessMap = new HashMap<String,ArrayList<Session>>();
+	
+	@Override
+	public Session connectToServer(Object arg0, URI arg1) throws DeploymentException, IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
-@ServerEndpoint(value = "/ChatTest")
-public class ChatServer extends Endpoint {
-	
-	private Map<String,LinkedList<Session>> clientMap = new HashMap<String,LinkedList<Session>>();
-	
-	@OnOpen
-	public void onOpen(Session s, EndpointConfig e) {
-		String key = String.valueOf(s.getUserProperties().get("diagKey"));
-		LinkedList<Session> lstClient = clientMap.get(key);
-		lstClient.add(s);
+	@Override
+	public Session connectToServer(Class<?> arg0, URI arg1) throws DeploymentException, IOException {
+		// TODO Auto-generated method stub
+		return null;
 	}
-	
-	@OnClose
-	public void onClose(Session s){
-		String key = String.valueOf(s.getUserProperties().get("diagKey"));
-		LinkedList<Session> lstClient = clientMap.get(key);
-		lstClient.remove(s);
+
+
+	@Override
+	public Session connectToServer(Endpoint arg0, ClientEndpointConfig arg1, URI arg2)
+			throws DeploymentException, IOException {
+		// TODO Auto-generated method stub		
+		return null;
 	}
-	
-	
-	/**
-	 * 메세지 받을때 사용
-	 * @param message
-	 * @param clientId
-	 */
-	@OnMessage
-	public void onMessage(String message,String clientId){
-		String key = "";
-		LinkedList<Session> lstClient = clientMap.get(key);
-		// 메세지 수신시, 관련된 Client들에게 모두 보냄
-		for(Session client : lstClient){
-			try {
-				client.getBasicRemote().sendText(message);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+
+
+	@Override
+	public Session connectToServer(Class<? extends Endpoint> arg0, ClientEndpointConfig arg1, URI arg2)
+			throws DeploymentException, IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public long getDefaultAsyncSendTimeout() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public int getDefaultMaxBinaryMessageBufferSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public long getDefaultMaxSessionIdleTimeout() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public int getDefaultMaxTextMessageBufferSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public Set<Extension> getInstalledExtensions() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public void setAsyncSendTimeout(long arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setDefaultMaxBinaryMessageBufferSize(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setDefaultMaxSessionIdleTimeout(long arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void setDefaultMaxTextMessageBufferSize(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
 		
 	}
 	
-	/**
-	 * 대화상대 조회시 사용
-	 * @param message
-	 * @param clientId
-	 */
-	@OnMessage
-	public void onMessage(Object message,String clientId){
-		ArrayList<String> rtnClient = new ArrayList<String>();
-		Session tarClient = null;
-		for(String key : clientMap.keySet() ){
-			LinkedList<Session> lstClient = clientMap.get(key);
-			// 객체 메세지 수신시, 접속된 Client들 정보를 모두 반환함.
-			for(Session client : lstClient){
-				String strName = String.valueOf(client.getUserProperties().get("clientName"));
-				rtnClient.add(strName);
-				if(strName.equals(clientId)){
-					tarClient = client;
-				}
-			}			
-		}		
-		if(tarClient == null){
-			return;
-		}
-		// 요청대상에 반환
-		try {
-			tarClient.getBasicRemote().sendObject(rtnClient);
-		} catch (IOException | EncodeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public static void main(String[] args){
+		Runnable c_instance = new ChatServer();
+		while(true){
+			c_instance.run();
 		}
 	}
-	
 }

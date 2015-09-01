@@ -15,6 +15,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.TableModel;
 
+import cnt.comm.ChatClient;
 import ui.component.ClientListModel;
 import ui.component.IMetaFrame;
 
@@ -33,17 +34,21 @@ public class frmMsgMain extends JFrame implements IMetaFrame{
 	// Properties
 	private Properties config;	
 
+	// 서버 연결 인스턴스
+	private ChatClient metaInstance = null;
 	/**
 	 * 화면 초기화 메소드
 	 */
 	public void init(){
 		String usrName = "";
+		String connUri = "";
 		// 창 설정
 		setLayout(null);
 		setLocation(200,200);
 		setSize(250,400);
 		config = readProp();
 		usrName = getUserName(config);
+		connUri = getConnUri(config);
 		setTitle(usrName + "님 환영합니다.");
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 			
@@ -63,7 +68,7 @@ public class frmMsgMain extends JFrame implements IMetaFrame{
 		
 		// 이름 편집용 EditorPane 설정 & 추가
 		// 자동 서버 접속
-		connect();
+		connect(connUri);
 	}
 	
 	/**
@@ -75,7 +80,16 @@ public class frmMsgMain extends JFrame implements IMetaFrame{
 		usrName = String.valueOf(prop.get("name"));
 		return usrName;
 	}
-
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private String getConnUri(Properties prop){
+		String uri = String.valueOf(prop.get("serverEndpoint"));
+		return uri;
+	}
+	
 	/**
 	 * 
 	 * @return
@@ -87,7 +101,7 @@ public class frmMsgMain extends JFrame implements IMetaFrame{
 		if(!prop.exists()){
 			// 파일이 없으면 만듬.(name=컴퓨터이름)
 			String pcName = getLocalName();
-			String defaultSvr = "";
+			String defaultSvr = "chatMess";
 			
 			rtnProp.setProperty("name", pcName);
 			// 접속 경로 자동 셋팅
@@ -169,8 +183,9 @@ public class frmMsgMain extends JFrame implements IMetaFrame{
 	/**
 	 * 서버 접속
 	 */
-	public void connect(){
-		System.out.println("Connected");
+	public void connect(String connUri){
+		metaInstance = new ChatClient(this, connUri);
+		
 	}
 	
 	/**
